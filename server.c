@@ -27,6 +27,25 @@ void GET(char filename[20])
     }
 
 }
+void USER(char name[20], char password[20])
+{
+    char fileName[20], filePassword[20];
+    FILE *fp;
+    fp = fopen("file.txt", "r");
+    rewind(fp);
+    //char *accesMessage = "200 User test granted to access.\n";
+    while (1) {
+        fscanf(fp, "%[^:]:%s\n", fileName, filePassword);
+        if (strcmp(fileName, name) == 0 && strcmp(filePassword, password) == 0) {
+           // send(fd, accesMessage, strlen(accesMessage), 0);
+            printf("USER OK!");
+        }
+        if (feof(fp))
+            break;
+    }
+
+    fclose(fp);
+}
 
 
 int main(int argc, char **argv) {
