@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <dirent.h>
 
 
 int main(int argc, char **argv)
@@ -17,7 +18,7 @@ int main(int argc, char **argv)
 		{
 			if(strcmp("-d",argv[i]) == 0){
                 dir = argv[i+1];
-                printf("%s\n",dir);
+                printf("%s\n", dir);
             }
             if(strcmp("-p",argv[i]) == 0){
                 port = argv[i+1];
@@ -34,8 +35,16 @@ int main(int argc, char **argv)
 		printf("Give correct arguments");
 	}
 
+    DIR *directory = opendir(".");
+    struct dirent *sd;
+    while ((sd = readdir(directory)) != NULL)
+    {
+        char buf[512];
+        snprintf(buf, 512, "%s %i\n", sd->d_name, sd->d_reclen);
+        printf("%s",buf);
+    }
 
 
-	
-	return 0;
+
+    return 0;
 }
