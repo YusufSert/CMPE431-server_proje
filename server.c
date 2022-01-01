@@ -4,11 +4,36 @@
 #include<stdbool.h>
 
 
+void LIST(char *dir)
+{
+    DIR *directory = opendir(dir);
+    struct dirent *sd;
+    while ((sd = readdir(directory)) != NULL)
+    {
+        char buf[512];
+        snprintf(buf, 512, "%s %i\n", sd->d_name, sd->d_reclen);
+        printf("%s\n",buf);
+    }
+
+
+}
+void GET(char filename[20])
+{
+    char buffer[512];
+    FILE *fp = fopen(filename, "r");
+    while (fgets(buffer, sizeof(buffer), fp ))
+    {
+        printf("%s",buffer);
+    }
+
+}
+
+
 int main(int argc, char **argv) {
     char *dir;
     char *port;
     char *passFile;
-    int x = 0;
+    int login = 0;
 
     if(argc == 7){
 
@@ -27,15 +52,16 @@ int main(int argc, char **argv) {
                 printf("%s\n",passFile);
             }
         }
-            x = 1;
+            login = 1;
     }
     else
     {
         printf("Give correct arguments");
     }
 
-    if(x){
-        printf("arguments are okişş");
+    if(login){
+     LIST(dir);
+    
     }
 
 
