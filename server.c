@@ -2,7 +2,16 @@
 
 int main(int argc, char *argv)
 {
-	printf("argc = %d", argc);
+	if(argc == 7){
+		printf("%d",argc);
+	}
+	else
+	{
+		printf("Give correct arguments");
+	}
+
+
+
 	
 	return 0;
 }
