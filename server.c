@@ -31,7 +31,7 @@ void USER(char name[20], char password[20])
 {
     char fileName[20], filePassword[20];
     FILE *fp;
-    fp = fopen("file.txt", "r");
+    fp = fopen("password.txt", "r");
     rewind(fp);
     //char *accesMessage = "200 User test granted to access.\n";
     while (1) {
@@ -43,7 +43,7 @@ void USER(char name[20], char password[20])
         if (feof(fp))
             break;
     }
-
+    printf("USER denied");
     fclose(fp);
 }
 
@@ -80,7 +80,8 @@ int main(int argc, char **argv) {
 
     if(login){
      LIST(dir);
-     GET(passFile);
+     //GET(passFile);
+     USER("yusuf","12134");
     }
 
 
