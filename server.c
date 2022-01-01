@@ -2,7 +2,7 @@
 
 int main(int argc, char *argv)
 {
-	printf("argc = %s", argc);
+	printf("argc = %d", argc);
 	
 	return 0;
 }
