@@ -1,22 +1,20 @@
 #include <stdio.h>
 #include <string.h>
 #include <dirent.h>
+#include<stdbool.h>
 
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
     char *dir;
     char *port;
     char *passFile;
+    int x = 0;
 
+    if(argc == 7){
 
-
-
-	if(argc == 7){
-		
-		for(int i=0; i < argc; i++)
-		{
-			if(strcmp("-d",argv[i]) == 0){
+        for(int i=0; i < argc; i++)
+        {
+            if(strcmp("-d",argv[i]) == 0){
                 dir = argv[i+1];
                 printf("%s\n", dir);
             }
@@ -29,20 +27,20 @@ int main(int argc, char **argv)
                 printf("%s\n",passFile);
             }
         }
-	}
-	else
-	{
-		printf("Give correct arguments");
-	}
-
-    DIR *directory = opendir(".");
-    struct dirent *sd;
-    while ((sd = readdir(directory)) != NULL)
-    {
-        char buf[512];
-        snprintf(buf, 512, "%s %i\n", sd->d_name, sd->d_reclen);
-        printf("%s",buf);
+            x = 1;
     }
+    else
+    {
+        printf("Give correct arguments");
+    }
+
+    if(x){
+        printf("arguments are okişş");
+    }
+
+
+
+
 
 
 
