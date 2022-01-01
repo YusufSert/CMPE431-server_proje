@@ -61,7 +61,7 @@ int main(int argc, char **argv) {
 
     if(login){
      LIST(dir);
-    
+     GET(passFile);
     }
 
 
