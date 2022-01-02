@@ -68,6 +68,7 @@ int main(int argc, char **argv) {
     struct sockaddr_in local_addr;
     struct sockaddr_in remote_addr;
     int length,fd,rcnt,optval;
+    in_port_t servPort;
     pid_t pid;
 
     if(argc == 7){
@@ -79,8 +80,8 @@ int main(int argc, char **argv) {
                 printf("%s\n", dir);
             }
             if(strcmp("-p",argv[i]) == 0){
-                port = argv[i+1];
-                printf("%s\n",port);
+                servPort = atoi(argv[i+i]);
+                printf("%d\n",servPort);
             }
             if(strcmp("-u",argv[i]) == 0){
                 passFile = argv[i+1];
@@ -107,7 +108,9 @@ int main(int argc, char **argv) {
         memset( &local_addr, 0, sizeof(local_addr) );
         memset( &remote_addr, 0, sizeof(remote_addr) );
 
-
+        local_addr.sin_family = AF_INET;
+        local_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+        local_addr.sin_port = htons(servPort);
 
     }
 
