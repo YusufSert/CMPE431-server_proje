@@ -129,7 +129,31 @@ int main(int argc, char **argv) {
 
         printf("Concurrent  FTP server now starting on port %d\n",servPort);
         printf("Wait for connection\n");
-        
+
+        while(1) {  // main accept() loop
+            length = sizeof remote_addr;
+            if ((fd = accept(server, (struct sockaddr *)&remote_addr, \
+          &length)) == -1) {
+                perror("Accept Problem!");
+                continue;
+            }
+
+            printf("Server: got connection from %s\n", \
+            inet_ntoa(remote_addr.sin_addr));
+
+            /* If fork create Child, take control over child and close on server side */
+            if ((pid=fork()) == 0) {
+                close(server);
+                do_job(fd);
+                printf("Child finished their job!\n");
+                close(fd);
+                exit(0);
+            }
+
+        }
+
+// Final Cleanup
+        close(server);
 
     }
 
