@@ -112,6 +112,25 @@ int main(int argc, char **argv) {
         local_addr.sin_addr.s_addr = htonl(INADDR_ANY);
         local_addr.sin_port = htons(servPort);
 
+        optval = 1;
+        setsockopt(server, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof optval);
+
+        if ( bind( server, (struct sockaddr *)&local_addr, sizeof(local_addr) ) < 0 )
+        {
+            /* could not start server */
+            perror("Bind error");
+            return(1);
+        }
+
+        if ( listen( server, SOMAXCONN ) < 0 ) {
+            perror("listen");
+            exit(1);
+        }
+
+        printf("Concurrent  FTP server now starting on port %d\n",servPort);
+        printf("Wait for connection\n");
+        
+
     }
 
 
