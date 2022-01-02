@@ -98,6 +98,15 @@ int main(int argc, char **argv) {
      //LIST(dir);
      //GET(passFile);
      //USER("yusuf","12134"); // bu true retunrlemeli
+
+        if ((server = socket( AF_INET, SOCK_STREAM, 0)) < 0 ) {
+            perror("Can't create socket!");
+            return(1);
+        }
+
+
+
+
     }
 
 
