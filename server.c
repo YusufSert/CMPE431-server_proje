@@ -1,7 +1,18 @@
+/* C header files */
 #include <stdio.h>
 #include <string.h>
 #include <dirent.h>
 #include<stdbool.h>
+#include <sys/types.h>
+#include <stdlib.h>
+
+/* Socket API headers */
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
+
+
 
 
 void LIST(char *dir)
@@ -43,7 +54,7 @@ void USER(char name[20], char password[20])
         if (feof(fp))
             break;
     }
-    printf("USER denied");
+    //printf("USER denied");
     fclose(fp);
 }
 
@@ -53,6 +64,11 @@ int main(int argc, char **argv) {
     char *port;
     char *passFile;
     int login = 0;
+    int server, client;
+    struct sockaddr_in local_addr;
+    struct sockaddr_in remote_addr;
+    int length,fd,rcnt,optval;
+    pid_t pid;
 
     if(argc == 7){
 
@@ -79,10 +95,11 @@ int main(int argc, char **argv) {
     }
 
     if(login){
-     LIST(dir);
+     //LIST(dir);
      //GET(passFile);
-     USER("yusuf","12134");
+     //USER("yusuf","12134"); // bu true retunrlemeli
     }
+
 
 
 
