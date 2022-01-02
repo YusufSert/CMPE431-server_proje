@@ -104,6 +104,8 @@ int main(int argc, char **argv) {
             return(1);
         }
 
+        memset( &local_addr, 0, sizeof(local_addr) );
+        memset( &remote_addr, 0, sizeof(remote_addr) );
 
 
 
