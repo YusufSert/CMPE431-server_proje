@@ -71,29 +71,29 @@ int main(int argc, char **argv) {
     in_port_t servPort;
     pid_t pid;
 
-    if(argc == 7){
+    // if(argc == 7){
 
-        for(int i=0; i < argc; i++)
-        {
-            if(strcmp("-d",argv[i]) == 0){
-                dir = argv[i+1];
-                printf("%s\n", dir);
-            }
-            if(strcmp("-p",argv[i]) == 0){
-                servPort = atoi(argv[i+i]);
-                printf("%d\n",servPort);
-            }
-            if(strcmp("-u",argv[i]) == 0){
-                passFile = argv[i+1];
-                printf("%s\n",passFile);
-            }
-        }
-            login = 1;
-    }
-    else
-    {
-        printf("Give correct arguments");
-    }
+    //     for(int i=0; i < argc; i++)
+    //     {
+    //         if(strcmp("-d",argv[i]) == 0){
+    //             dir = argv[i+1];
+    //             printf("%s\n", dir);
+    //         }
+    //         if(strcmp("-p",argv[i]) == 0){
+    //             servPort = atoi(argv[i+i]);
+    //             printf("%d\n",servPort);
+    //         }
+    //         if(strcmp("-u",argv[i]) == 0){
+    //             passFile = argv[i+1];
+    //             printf("%s\n",passFile);
+    //         }
+    //     }
+    //         login = 1;
+    // }
+    // else
+    // {
+    //     printf("Give correct arguments");
+    // }
 
     if(login){
      //LIST(dir);
