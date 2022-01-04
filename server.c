@@ -82,7 +82,21 @@ void do_job(int fd) {
         rcnt = recv(fd, recvbuf, recvbuflen, 0);
         if (rcnt > 0) {
 
+            sscanf(recvbuf, "%s %s %s", key1, key2, key3);
+            if (strncmp("LIST", key1, 4) == 0) {
+                DIR *dir;
+                struct dirent *sd;
 
+                dir = opendir(".");
+                if (dir == NULL) {
+                    printf("Error!");
+                }
+                while ((sd = readdir(dir)) != NULL) {
+                    char buf[512];
+                    snprintf(buf, 512, "%s %i\n", sd->d_name, sd->d_reclen);
+                    send(fd, buf, strlen(buf), 0);
+                }
+            }
 
             // Echo the buffer back to the sender
             rcnt = send( fd, recvbuf, rcnt, 0 );
@@ -109,14 +123,13 @@ void do_job(int fd) {
 
 int main(int argc, char **argv) {
     char *dir;
-    char *port;
+    in_port_t servPort;
     char *passFile;
     int login = 0;
     int server, client;
     struct sockaddr_in local_addr;
     struct sockaddr_in remote_addr;
     int length,fd,rcnt,optval;
-    in_port_t servPort;
     pid_t pid;
     int a;
 
@@ -128,7 +141,7 @@ int main(int argc, char **argv) {
                 dir = optarg;
                 break;
             case 'p':
-                port = optarg;
+                servPort = atoi(optarg);
                 break;
             case 'u':
                 passFile = optarg;
@@ -183,7 +196,7 @@ int main(int argc, char **argv) {
 /* Set values to local_addr structure */
     local_addr.sin_family = AF_INET;
     local_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    local_addr.sin_port = htons(atoi(port));
+    local_addr.sin_port = htons(servPort);
 
 // set SO_REUSEADDR on a socket to true (1):
     optval = 1;
@@ -201,7 +214,7 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
-    printf("Concurrent  socket server now starting on port %d\n", atoi(port));
+    printf("Concurrent  socket server now starting on port %d\n", servPort);
     printf("Wait for connection\n");
 
     while(1) {  // main accept() loop
