@@ -5,6 +5,7 @@
 #include<stdbool.h>
 #include <sys/types.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 /* Socket API headers */
 #include <sys/socket.h>
@@ -70,7 +71,33 @@ int main(int argc, char **argv) {
     int length,fd,rcnt,optval;
     in_port_t servPort;
     pid_t pid;
+    int a;
 
+    while ( (a = getopt(argc,argv, "d:p:u")) != -1)
+    {
+        switch(a)
+        {
+            case 'd':
+                dir = optarg;
+                break;
+            case 'p':
+                port = optarg;
+                break;
+            case 'u':
+                passFile = optarg;
+                break;
+            case '?':
+                if(optopt == 'p' || optopt == 'u' || optopt == 'd')
+                    printf( "Option -%c needs argument\n", optopt);
+                else
+                    printf( "Unknown option -%c. \n", optopt);
+
+                break;
+            default:
+                printf( "getopt");
+        }
+    }
+    LIST(dir);
     // if(argc == 7){
 
     //     for(int i=0; i < argc; i++)
@@ -95,8 +122,9 @@ int main(int argc, char **argv) {
     //     printf("Give correct arguments");
     // }
 
+/*
     if(login){
-     //LIST(dir);
+     LIST(dir);
      //GET(passFile);
      //USER("yusuf","12134"); // bu true retunrlemeli
 
@@ -117,7 +145,7 @@ int main(int argc, char **argv) {
 
         if ( bind( server, (struct sockaddr *)&local_addr, sizeof(local_addr) ) < 0 )
         {
-            /* could not start server */
+
             perror("Bind error");
             return(1);
         }
@@ -141,7 +169,7 @@ int main(int argc, char **argv) {
             printf("Server: got connection from %s\n", \
             inet_ntoa(remote_addr.sin_addr));
 
-            /* If fork create Child, take control over child and close on server side */
+
             if ((pid=fork()) == 0) {
                 close(server);
                 do_job(fd);
@@ -152,7 +180,7 @@ int main(int argc, char **argv) {
 
         }
 
-// Final Cleanup
+
         close(server);
 
     }
@@ -162,7 +190,8 @@ int main(int argc, char **argv) {
 
 
 
-
+*/
 
     return 0;
+
 }
