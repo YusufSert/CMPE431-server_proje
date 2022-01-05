@@ -135,6 +135,7 @@ void do_job(int fd,char *dir, char *passFile ) {
                     if (strncmp("QUIT", key1, 4) == 0) {
                         rcnt = 0;
                         send(fd, "Good bye!", 100, 0);
+                        exit(0);
                     }
 
                 }
