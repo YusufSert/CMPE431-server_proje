@@ -94,9 +94,24 @@ void do_job(int fd,char *dir, char *passFile ) {
             sscanf(recvbuf, "%s %s %s", key1, key2, key3);
 
 
-            if(strncmp("USER",key1, 4) == 0)
+            if(strncmp("SS", key1, 4) == 0)
             {
-                USER(key2,key3,passFile,fd);
+                char fileName[20], filePassword[20];
+                FILE *fp;
+                fp = fopen("text.txt", "r");
+                rewind(fp);
+                char *accesMessage = "200 User test granted to access.\n";
+                while (1) {
+                    fscanf(fp, "%[^:]:%s\n", fileName, filePassword);
+                    if (strcmp(fileName, key2) == 0) {
+                        send(fd, accesMessage, strlen(accesMessage), 0);
+                        printf("USER OK!");
+                    }
+                    if (feof(fp))
+                        break;
+                }
+                //printf("USER denied");
+                fclose(fp);
             }
 
             /// **************** LIST *******************  ///
