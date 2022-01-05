@@ -1,4 +1,4 @@
-server -d /home/student/files -p 1888 -u password
+server -d /home/student/files -p 1888 -u password.txt
 
 yaparak çalışır
 
