@@ -16,7 +16,7 @@
 
 
 
-void LIST(char *dir)
+void LIST(char *dir,int fd)
 {
     DIR *directory = opendir(dir);
     struct dirent *sd;
@@ -24,36 +24,36 @@ void LIST(char *dir)
     {
         char buf[512];
         snprintf(buf, 512, "%s %i\n", sd->d_name, sd->d_reclen);
-        printf("%s\n",buf);
+        send(fd, buf, strlen(buf), 0);
     }
 
 
 }
 
 
-void GET(char filename[20])
+void GET(char filename[20], int fd)
 {
     char buffer[512];
     FILE *fp = fopen(filename, "r");
     while (fgets(buffer, sizeof(buffer), fp ))
     {
-        printf("%s",buffer);
+        send(fd, buffer, strlen(buffer), 0);
     }
-
+    fclose(fp);
 }
 
 
-void USER(char name[20], char password[20])
+void USER(char name[20], char password[20],char file[20], int fd)
 {
     char fileName[20], filePassword[20];
     FILE *fp;
-    fp = fopen("password.txt", "r");
+    fp = fopen(file, "r");
     rewind(fp);
-    //char *accesMessage = "200 User test granted to access.\n";
+    char *accesMessage = "200 User test granted to access.\n";
     while (1) {
         fscanf(fp, "%[^:]:%s\n", fileName, filePassword);
         if (strcmp(fileName, name) == 0 && strcmp(filePassword, password) == 0) {
-           // send(fd, accesMessage, strlen(accesMessage), 0);
+            send(fd, accesMessage, strlen(accesMessage), 0);
             printf("USER OK!");
         }
         if (feof(fp))
@@ -63,13 +63,22 @@ void USER(char name[20], char password[20])
     fclose(fp);
 }
 
-
+void DEL(char filename[20], int fd)
+{
+    if(remove(filename) == 0)
+    {
+        char buf[100];
+        snprintf(buf,100,"File %s deleted.",filename);
+        //send(fd, buf, sizeof(buf), 0);
+        printf("%s", buf);
+    }
+}
 
 
 
 ////////////////////////////////////////////////////////////////////7
 
-void do_job(int fd) {
+void do_job(int fd,char *dir, char *passFile ) {
     int length,rcnt;
     char recvbuf[DEFAULT_BUFLEN],bmsg[DEFAULT_BUFLEN];
     int  recvbuflen = DEFAULT_BUFLEN;
@@ -83,38 +92,57 @@ void do_job(int fd) {
         if (rcnt > 0) {
 
             sscanf(recvbuf, "%s %s %s", key1, key2, key3);
-            if (strncmp("LIST", key1, 4) == 0) {
-                DIR *dir;
-                struct dirent *sd;
 
-                dir = opendir(".");
-                if (dir == NULL) {
-                    printf("Error!");
+
+            if(strncmp("USER",key1, 4) == 0)
+            {
+                USER(key2,key3,passFile,fd);
+            }
+
+            /// **************** LIST *******************  ///
+            if (strncmp("LIST", key1, 4) == 0) {
+                LIST(dir,fd);
+            }
+
+            ///******************** GET **************************** ///
+            if (strncmp("GET", key1, 3) == 0){
+                GET(key2,fd);
+            }
+
+            if (strncmp("DEL", key1, 3) == 0)
+            {
+                printf("ss");
+                if (remove(key2) == 0) {
+                    printf("The file is deleted successfully.");
+                } else {
+                    printf("The file is not deleted.");
                 }
-                while ((sd = readdir(dir)) != NULL) {
-                    char buf[512];
-                    snprintf(buf, 512, "%s %i\n", sd->d_name, sd->d_reclen);
-                    send(fd, buf, strlen(buf), 0);
-                }
+            }
+            if (strncmp("QUIT", key1, 4) == 0) {
+                rcnt = 0;
+                send(fd,"Good bye!",100,0);
             }
 
             // Echo the buffer back to the sender
-            rcnt = send( fd, recvbuf, rcnt, 0 );
+           /* rcnt = send( fd, recvbuf, rcnt, 0 );
             if (rcnt < 0) {
                 printf("Send failed:\n");
                 close(fd);
                 break;
+            */
             }
-            printf("Bytes sent: %d\n", rcnt);
+            //printf("Bytes sent: %d\n", rcnt);
 
-        }
-        else if (rcnt == 0)
+
+        /*else if (rcnt == 0)
             printf("Connection closing...\n");
         else  {
             printf("Receive failed:\n");
             close(fd);
             break;
         }
+         */
+
     } while (rcnt > 0);
 }
 
@@ -231,7 +259,7 @@ int main(int argc, char **argv) {
         /* If fork create Child, take control over child and close on server side */
         if ((pid=fork()) == 0) {
             close(server);
-            do_job(fd);
+            do_job(fd, dir, passFile);
             printf("Child finished their job!\n");
             close(fd);
             exit(0);
