@@ -26,8 +26,6 @@ void LIST(char *dir,int fd)
         snprintf(buf, 512, "%s %i\n", sd->d_name, sd->d_reclen);
         send(fd, buf, strlen(buf), 0);
     }
-
-
 }
 
 
@@ -79,14 +77,15 @@ void DEL(char filename[20], int fd)
 ////////////////////////////////////////////////////////////////////7
 
 void do_job(int fd,char *dir, char *passFile ) {
-    int length,rcnt;
-    char recvbuf[DEFAULT_BUFLEN],bmsg[DEFAULT_BUFLEN];
-    int  recvbuflen = DEFAULT_BUFLEN;
+    int length, rcnt;
+    char recvbuf[DEFAULT_BUFLEN], bmsg[DEFAULT_BUFLEN];
+    int recvbuflen = DEFAULT_BUFLEN;
     char key1[20];
     char key2[20];
     char key3[20];
-
+    int userAccess = 0;
     // Receive until the peer shuts down the connection
+    send(fd,"Welcome to Yusuf's file server.\n",33, 0);
     do {
         rcnt = recv(fd, recvbuf, recvbuflen, 0);
         if (rcnt > 0) {
@@ -94,75 +93,63 @@ void do_job(int fd,char *dir, char *passFile ) {
             sscanf(recvbuf, "%s %s %s", key1, key2, key3);
 
 
-            if(strncmp("SS", key1, 4) == 0)
-            {
+            if (strncmp("USER", key1, 5) == 0) {
                 char fileName[20], filePassword[20];
                 FILE *fp;
-                fp = fopen("text.txt", "r");
+                fp = fopen(passFile, "r");
                 rewind(fp);
-                char *accesMessage = "200 User test granted to access.\n";
-                while (1) {
-                    fscanf(fp, "%[^:]:%s\n", fileName, filePassword);
-                    if (strcmp(fileName, key2) == 0) {
+                //char *accesMessage = "200 User test granted to access.\n";
+                char accesMessage[50];
+                snprintf(accesMessage,50,"200 User %s granted to access.\n", key2);
+                while (fscanf(fp,"%[^:]:%s\n",fileName, filePassword) != EOF) {
+                    if (strcmp(fileName, key2) == 0 && strcmp(filePassword, key3) == 0) {
                         send(fd, accesMessage, strlen(accesMessage), 0);
-                        printf("USER OK!");
+                        userAccess = 1;
                     }
-                    if (feof(fp))
-                        break;
                 }
-                //printf("USER denied");
                 fclose(fp);
             }
+                if(userAccess) {
+                    /// **************** LIST *******************  ///
+                    if (strncmp("LIST", key1, 4) == 0) {
+                        LIST(dir, fd);
+                    }
 
-            /// **************** LIST *******************  ///
-            if (strncmp("LIST", key1, 4) == 0) {
-                LIST(dir,fd);
-            }
+                    ///******************** GET **************************** ///
+                    if (strncmp("GET", key1, 3) == 0) {
+                        GET(key2, fd);
+                    }
 
-            ///******************** GET **************************** ///
-            if (strncmp("GET", key1, 3) == 0){
-                GET(key2,fd);
-            }
+                    if (strncmp("DEL", key1, 3) == 0) {
+                        if (remove(key2) == 0) {
+                            //printf("The file is deleted successfully.");
+                            char buf[35];
+                            snprintf(buf,35 ,"File %s deleted\n.", key2);
+                            send(fd, buf, sizeof(buf), 0);
+                        } else {
+                            char buf[100];
+                            snprintf(buf, 100,"404 File %s is not on the server.\n", key2);
+                            send(fd,buf,sizeof(buf),0);
+                        }
+                    }
+                    if (strncmp("QUIT", key1, 4) == 0) {
+                        rcnt = 0;
+                        send(fd, "Good bye!", 100, 0);
+                    }
 
-            if (strncmp("DEL", key1, 3) == 0)
-            {
-                printf("ss");
-                if (remove(key2) == 0) {
-                    printf("The file is deleted successfully.");
-                } else {
-                    printf("The file is not deleted.");
                 }
-            }
-            if (strncmp("QUIT", key1, 4) == 0) {
-                rcnt = 0;
-                send(fd,"Good bye!",100,0);
+                else{
+                    send(fd,"400 User not found. Please try with another user.\n", 100, 0);
+                }
+
             }
 
-            // Echo the buffer back to the sender
-           /* rcnt = send( fd, recvbuf, rcnt, 0 );
-            if (rcnt < 0) {
-                printf("Send failed:\n");
-                close(fd);
-                break;
-            */
-            }
-            //printf("Bytes sent: %d\n", rcnt);
 
-
-        /*else if (rcnt == 0)
-            printf("Connection closing...\n");
-        else  {
-            printf("Receive failed:\n");
-            close(fd);
-            break;
         }
-         */
+        while (rcnt > 0);
+    }
 
-    } while (rcnt > 0);
-}
-
-/////////////////////////////////////////////////////////////////7
-
+/////////////////////////////////////////////////////////////////
 
 int main(int argc, char **argv) {
     char *dir;
@@ -176,7 +163,7 @@ int main(int argc, char **argv) {
     pid_t pid;
     int a;
 
-    while ( (a = getopt(argc,argv, "d:p:u")) != -1)
+    while ( (a = getopt(argc,argv, "d:p:u:")) != -1)
     {
         switch(a)
         {
