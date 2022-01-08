@@ -14,6 +14,15 @@
 
 #define DEFAULT_BUFLEN 512
 
+void PUT(char *file, char *buffer){
+    FILE *fp;
+    fp = fopen(file, "w+");
+    recv(fd, recvbuf, recvbuflen, 0);
+    fprintf(r)
+
+
+}
+
 
 
 void LIST(char *dir,int fd)
